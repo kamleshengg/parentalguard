@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Family Safety</title>
+<link rel="manifest" href="/child/manifest.json">
+<meta name="theme-color" content="#1e3a5f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1f35;
+  --surface: #1a3254;
+  --surface2: #1e3a5f;
+  --accent: #38bdf8;
+  --accent2: #34d399;
+  --border: rgba(56,189,248,0.15);
+  --text: #e2e8f0;
+  --text2: #94a3b8;
+  --radius: 20px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  max-width: 480px;
+  margin: 0 auto;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.screen { display:none; min-height:100vh; }
+.screen.active { display:flex; flex-direction:column; }
+
+/* ── Pairing Screen ── */
+.pair-hero {
+  background: linear-gradient(160deg, #1a3254 0%, #0f1f35 100%);
+  padding: 60px 32px 40px;
+  text-align: center;
+}
+
+.shield-icon {
+  width: 80px; height: 80px;
+  background: linear-gradient(135deg, var(--accent), #818cf8);
+  border-radius: 24px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px;
+  margin: 0 auto 20px;
+  box-shadow: 0 8px 32px rgba(56,189,248,0.3);
+}
+
+.pair-title { font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+.pair-sub { color: var(--text2); font-size: 14px; line-height: 1.6; }
+
+.pair-body { padding: 24px; flex: 1; }
+
+.step-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.step-num {
+  width: 28px; height: 28px;
+  background: var(--accent);
+  color: #0f1f35;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.step-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+.step-desc { font-size: 13px; color: var(--text2); line-height: 1.5; }
+
+.code-inputs {
+  display: flex; gap: 8px; justify-content: center;
+  margin: 16px 0;
+}
+
+.code-input {
+  width: 44px; height: 54px;
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
+  font-family: 'Space Grotesk', sans-serif;
+  outline: none;
+  text-transform: uppercase;
+}
+.code-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(56,189,248,0.15); }
+
+.btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 16px 24px;
+  border-radius: 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  width: 100%;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #0ea5e9);
+  color: #0f172a;
+  box-shadow: 0 4px 20px rgba(56,189,248,0.35);
+}
+.btn-primary:active { transform: scale(0.97); }
+
+/* ── Consent Screen ── */
+.consent-header {
+  background: linear-gradient(160deg, #1a3254, #0f1f35);
+  padding: 48px 24px 32px;
+  text-align: center;
+}
+
+.consent-body { padding: 24px; flex: 1; overflow-y: auto; }
+
+.consent-item {
+  display: flex; align-items: flex-start; gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.consent-icon { font-size: 22px; margin-top: 2px; }
+.consent-text-title { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+.consent-text-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+.consent-footer { padding: 20px 24px; border-top: 1px solid var(--border); }
+
+.checkbox-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  margin-bottom: 20px;
+}
+.checkbox-row input[type="checkbox"] {
+  width: 20px; height: 20px;
+  margin-top: 2px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.checkbox-label { font-size: 13px; color: var(--text2); line-height: 1.5; }
+
+/* ── Home Screen ── */
+.home-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 48px 24px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.greeting { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; }
+.greeting-sub { font-size: 13px; color: var(--text2); margin-top: 3px; }
+
+.home-body { padding: 20px; flex: 1; }
+
+.status-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 16px;
+}
+
+.status-ring {
+  width: 64px; height: 64px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.section-label {
+  font-size: 12px; font-weight: 600;
+  color: var(--text2);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 20px 0 12px;
+}
+
+.monitoring-item {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+}
+
+.mon-icon {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.mon-title { font-size: 14px; font-weight: 600; }
+.mon-status { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+.active-dot {
+  width: 8px; height: 8px;
+  background: var(--accent2);
+  border-radius: 50%;
+  margin-left: auto;
+  box-shadow: 0 0 6px var(--accent2);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
+
+.info-banner {
+  background: rgba(56,189,248,0.08);
+  border: 1px solid rgba(56,189,248,0.2);
+  border-radius: 14px;
+  padding: 16px;
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.6;
+  display: flex; gap: 12px;
+}
+
+.screen-time-bar {
+  background: rgba(56,189,248,0.1);
+  border-radius: 8px;
+  height: 10px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+.screen-time-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #818cf8);
+  border-radius: 8px;
+  transition: width 1s ease;
+}
+
+.toast {
+  position: fixed;
+  bottom: 24px; left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 100;
+  white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+.spinner {
+  width: 22px; height: 22px;
+  border: 2px solid rgba(15,23,42,0.3);
+  border-top-color: #0f172a;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════
+     PAIRING SCREEN
+═══════════════════════════ -->
+<div class="screen active" id="screen-pair">
+  <div class="pair-hero">
+    <div class="shield-icon">🛡️</div>
+    <div class="pair-title">Family Safety</div>
+    <div class="pair-sub">Connect this device to your parent's ParentalGuard account for safe, transparent monitoring</div>
+  </div>
+  <div class="pair-body">
+    <div class="step-card">
+      <div class="step-num">1</div>
+      <div class="step-title">Get the pairing code</div>
+      <div class="step-desc">Ask a parent to open the ParentalGuard dashboard and add this device. They'll see a 6-character code.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">2</div>
+      <div class="step-title">Enter the code below</div>
+      <div class="step-desc">Type the code from the parent dashboard:</div>
+      <div class="code-inputs">
+        <input class="code-input" maxlength="1" id="c0" oninput="nextCode(this,1)" onkeydown="prevCode(event,0)">
+        <input class="code-input" maxlength="1" id="c1" oninput="nextCode(this,2)" onkeydown="prevCode(event,1)">
+        <input class="code-input" maxlength="1" id="c2" oninput="nextCode(this,3)" onkeydown="prevCode(event,2)">
+        <input class="code-input" maxlength="1" id="c3" oninput="nextCode(this,4)" onkeydown="prevCode(event,3)">
+        <input class="code-input" maxlength="1" id="c4" oninput="nextCode(this,5)" onkeydown="prevCode(event,4)">
+        <input class="code-input" maxlength="1" id="c5" oninput="nextCode(this,-1)" onkeydown="prevCode(event,5)">
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="doPair()" id="pair-btn">
+      <span id="pair-btn-text">Connect Device</span>
+    </button>
+    <div style="text-align:center;margin-top:16px;font-size:12px;color:var(--text2)">
+      For demo: type <strong style="color:var(--accent);font-family:monospace">DEMO01</strong>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════
+     CONSENT SCREEN
+═══════════════════════════ -->
+<div class="screen" id="screen-consent">
+  <div class="consent-header">
+    <div class="shield-icon">✅</div>
+    <div style="font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:700; margin-bottom:8px">Monitoring Agreement</div>
+    <div style="font-size:13px; color:var(--text2); line-height:1.6">Your parent has set up monitoring on this device. Here's what will be tracked — transparently and with your awareness:</div>
+  </div>
+  <div class="consent-body">
+    <div class="consent-item">
+      <div class="consent-icon">📍</div>
+      <div>
+        <div class="consent-text-title">GPS Location</div>
+        <div class="consent-text-desc">Your real-time location and location history will be shared with your parent.</div>
+      </div>
+    </div>
+    <div class="consent-item">
+      <div class="consent-icon">📱</div>
+      <div>
+        <div class="consent-text-title">App Usage</div>
+        <div class="consent-text-desc">Which apps you use and for how long each day.</div>
+      </div>
+    </div>
+    <div class="consent-item">
+      <div class="consent-icon">⏱️</div>
+      <div>
+        <div class="consent-text-title">Screen Time</div>
+        <div class="consent-text-desc">Total daily screen usage. Your parent can set time limits.</div>
+      </div>
+    </div>
+    <div class="consent-item">
+      <div class="consent-icon">🌐</div>
+      <div>
+        <div class="consent-text-title">Web Filtering</div>
+        <div class="consent-text-desc">Certain websites may be blocked. Browsing categories are monitored.</div>
+      </div>
+    </div>
+    <div class="consent-item">
+      <div class="consent-icon">🔋</div>
+      <div>
+        <div class="consent-text-title">Device Status</div>
+        <div class="consent-text-desc">Battery level, device name, and online/offline status.</div>
+      </div>
+    </div>
+    <div class="info-banner">
+      <span>ℹ️</span>
+      <span>You can always see what is being monitored on this screen. This monitoring is for your safety, not punishment. Talk to your parent if you have concerns.</span>
+    </div>
+  </div>
+  <div class="consent-footer">
+    <div class="checkbox-row">
+      <input type="checkbox" id="consent-check">
+      <label class="checkbox-label" for="consent-check">I understand that this device is being monitored by my parent for my safety, and I agree to these terms.</label>
+    </div>
+    <button class="btn btn-primary" onclick="giveConsent()">I Understand & Agree</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════
+     HOME SCREEN
+═══════════════════════════ -->
+<div class="screen" id="screen-home">
+  <div class="home-header">
+    <div>
+      <div class="greeting">Hi, <span id="child-name-display">Sara</span> 👋</div>
+      <div class="greeting-sub" id="date-display">Saturday, May 30</div>
+    </div>
+    <div style="width:44px;height:44px;background:linear-gradient(135deg,var(--accent),#818cf8);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px">🛡️</div>
+  </div>
+
+  <div class="home-body">
+    <!-- Screen Time -->
+    <div class="status-card">
+      <div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:4px">TODAY'S SCREEN TIME</div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700" id="child-screen-time">3h 20m</div>
+        <div style="font-size:12px;color:var(--text2)" id="child-screen-limit">of 3h 0m daily limit</div>
+        <div class="screen-time-bar" style="width:200px;margin-top:8px">
+          <div class="screen-time-fill" id="child-screen-bar" style="width:110%"></div>
+        </div>
+      </div>
+      <div style="margin-left:auto;text-align:center">
+        <div style="font-size:28px">⚠️</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:4px">Limit<br>Reached</div>
+      </div>
+    </div>
+
+    <!-- Location -->
+    <div class="status-card">
+      <div style="width:44px;height:44px;background:rgba(56,189,248,0.1);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📍</div>
+      <div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:3px">CURRENT LOCATION</div>
+        <div style="font-size:16px;font-weight:600" id="child-location">Home — Al Quoz</div>
+        <div style="font-size:11px;color:var(--text2)">Sharing with parent · <span style="color:var(--accent2)">✓ In safe zone</span></div>
+      </div>
+      <div class="active-dot"></div>
+    </div>
+
+    <div class="section-label">What is being monitored</div>
+
+    <div id="monitoring-items">
+      <div class="monitoring-item">
+        <div class="mon-icon" style="background:rgba(56,189,248,0.1)">📍</div>
+        <div><div class="mon-title">GPS Location</div><div class="mon-status">Sharing every 5 minutes</div></div>
+        <div class="active-dot"></div>
+      </div>
+      <div class="monitoring-item">
+        <div class="mon-icon" style="background:rgba(129,140,248,0.1)">📱</div>
+        <div><div class="mon-title">App Usage</div><div class="mon-status">7 apps used today</div></div>
+        <div class="active-dot"></div>
+      </div>
+      <div class="monitoring-item">
+        <div class="mon-icon" style="background:rgba(52,211,153,0.1)">🌐</div>
+        <div><div class="mon-title">Web Filtering</div><div class="mon-status">Active — 1 site blocked today</div></div>
+        <div class="active-dot"></div>
+      </div>
+      <div class="monitoring-item">
+        <div class="mon-icon" style="background:rgba(251,191,36,0.1)">💬</div>
+        <div><div class="mon-title">Message Monitoring</div><div class="mon-status">Off — not enabled</div></div>
+        <div style="width:8px;height:8px;background:var(--text2);border-radius:50%;margin-left:auto"></div>
+      </div>
+    </div>
+
+    <div class="info-banner">
+      <span>🔒</span>
+      <div>This app is running transparently. Your parent can see your location, apps, and web activity. This is to keep you safe.</div>
+    </div>
+
+    <div style="margin-top:16px;text-align:center">
+      <button onclick="showToast('Message sent to parent 📩')" style="background:none;border:1px solid var(--border);color:var(--text2);padding:12px 24px;border-radius:12px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif">
+        📩 Message Parent
+      </button>
+    </div>
+
+  </div><!-- /home-body -->
+</div><!-- /screen-home -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── State ──
+let childToken = localStorage.getItem('pg_child_token');
+let childData = JSON.parse(localStorage.getItem('pg_child_data') || 'null');
+let pairingCode = '';
+let watchId = null;
+let reportInterval = null;
+
+// ── Boot ──
+if (childToken && childData) {
+  showScreen('screen-home');
+  startMonitoring();
+  updateHomeUI();
+} else {
+  showScreen('screen-pair');
+}
+
+// ── Code inputs ──
+function nextCode(el, nextIdx) {
+  if (el.value && nextIdx >= 0) document.getElementById('c' + nextIdx)?.focus();
+  pairingCode = ['c0','c1','c2','c3','c4','c5'].map(id => (document.getElementById(id)?.value||'').toUpperCase()).join('');
+}
+function prevCode(e, idx) {
+  if (e.key === 'Backspace' && !document.getElementById('c'+idx).value && idx > 0) {
+    document.getElementById('c'+(idx-1))?.focus();
+  }
+}
+
+// ── Pairing ──
+async function doPair() {
+  const code = ['c0','c1','c2','c3','c4','c5'].map(id => (document.getElementById(id)?.value||'').toUpperCase()).join('');
+  if (code.length !== 6) return showToast('Enter the full 6-character code');
+  document.getElementById('pair-btn-text').innerHTML = '<div class="spinner"></div>';
+  try {
+    const deviceId = 'device-' + Date.now();
+    const r = await fetch('/api/pair', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pairingCode: code, deviceId, deviceName: 'Child Browser PWA' })
+    });
+    const data = await r.json();
+    if (data.success) {
+      childToken = data.childToken;
+      childData = data;
+      localStorage.setItem('pg_child_token', childToken);
+      localStorage.setItem('pg_child_data', JSON.stringify(data));
+      showScreen('screen-consent');
+    } else {
+      showToast('Invalid code — try again');
+    }
+  } catch(e) {
+    // Demo fallback
+    childToken = 'demo-child-token';
+    childData = { childId: 'child-001', settings: { locationTracking: true } };
+    localStorage.setItem('pg_child_token', childToken);
+    localStorage.setItem('pg_child_data', JSON.stringify(childData));
+    showScreen('screen-consent');
+  }
+  document.getElementById('pair-btn-text').textContent = 'Connect Device';
+}
+
+// ── Consent ──
+function giveConsent() {
+  if (!document.getElementById('consent-check').checked) {
+    return showToast('Please check the checkbox to agree');
+  }
+  showScreen('screen-home');
+  startMonitoring();
+  updateHomeUI();
+}
+
+// ── Home UI ──
+function updateHomeUI() {
+  const now = new Date();
+  document.getElementById('date-display').textContent = now.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+}
+
+// ── Monitoring ──
+function startMonitoring() {
+  startLocationTracking();
+  startAppReporting();
+  listenForDeviceCommands();
+}
+
+function startLocationTracking() {
+  if (!childData?.settings?.locationTracking) return;
+  if (!navigator.geolocation) return;
+
+  const sendLocation = (pos) => {
+    const { latitude: lat, longitude: lng, accuracy } = pos.coords;
+    document.getElementById('child-location').textContent = `${lat.toFixed(4)}° N, ${lng.toFixed(4)}° E`;
+    fetch('/api/location/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        childId: childData.childId || 'child-001',
+        lat, lng, accuracy,
+        label: 'Current Location'
+      })
+    }).catch(() => {});
+  };
+
+  navigator.geolocation.watchPosition(sendLocation, () => {}, {
+    enableHighAccuracy: true,
+    timeout: 30000,
+    maximumAge: 60000
+  });
+}
+
+function startAppReporting() {
+  // Report screen time every 5 minutes
+  reportInterval = setInterval(() => {
+    fetch('/api/apps/report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        childId: childData?.childId || 'child-001',
+        apps: [{ name: 'Browser (PWA)', icon: '🌐', minutes: 5, category: 'Browser', safe: true }]
+      })
+    }).catch(() => {});
+  }, 5 * 60 * 1000);
+}
+
+function listenForDeviceCommands() {
+  // Listen to socket for remote lock/unlock commands
+  try {
+    const script = document.createElement('script');
+    script.src = '/socket.io/socket.io.js';
+    script.onload = () => {
+      const socket = io();
+      socket.on('connect', () => {
+        socket.emit('join:child', { childId: childData?.childId || 'child-001' });
+      });
+      socket.on('device:' + (childData?.childId || 'child-001'), (cmd) => {
+        if (cmd.action === 'lock') {
+          document.body.innerHTML = `<div style="position:fixed;inset:0;background:#0f1f35;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;color:#e2e8f0">
+            <div style="font-size:60px;margin-bottom:20px">🔒</div>
+            <div style="font-size:22px;font-weight:700">Device Locked</div>
+            <div style="font-size:14px;color:#94a3b8;margin-top:8px">A parent has locked this device</div>
+          </div>`;
+        }
+      });
+    };
+    document.head.appendChild(script);
+  } catch(e) {}
+}
+
+// ── Utils ──
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id)?.classList.add('active');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── Service Worker ──
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/child/sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
